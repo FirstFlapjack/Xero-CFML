@@ -193,8 +193,14 @@
             }
             if (structKeyExists(variables.instance,"Addresses")) {
               if (NOT listFindNoCase(arguments.exclude, "Addresses")) {
+              	myStruct["Addresses"] = [];
                 if (ArrayLen(variables.instance.Addresses) GT 0) {
-                  myStruct["Addresses"]=getAddresses();
+                	for(n = 1; n lte arrayLen(getAddresses()); n = n+1)
+                	{
+						str = getAddresses()[n].toStruct();
+                		arrayAppend(myStruct["Addresses"], str);
+                	}
+                  
                 }
               }
             }
@@ -326,7 +332,6 @@
             }
           }
         </cfscript>
-
     <cfif returnType EQ "Struct">
        <cfreturn myStruct />
     <cfelse>
@@ -486,10 +491,18 @@
         } else {
           setWebsite("");
         }
-        if (structKeyExists(obj,"BatchPayments")) {
-          setBatchPayments(obj.BatchPayments);
+							
+        if (structKeyExists(obj,"BatchPayments")) {	
+        	if(isStruct(obj.BatchPayments))
+        	{
+        		setBatchPayments(obj.BatchPayments);
+        	}
+        	else {
+          		setBatchPayments(structNew());
+        	}
+          
         } else {
-          setBatchPayments("");
+          setBatchPayments(structNew());
         }
         if (structKeyExists(obj,"Discount")) {
           setDiscount(obj.Discount);
@@ -791,7 +804,7 @@
    * @return Addresses
   --->
   <cffunction name="getAddresses" access="public" output="false" hint="I return the Addresses">
-    <cfreturn variables.instance.Addresses />
+  	<cfreturn variables.instance.Addresses />
   </cffunction>
 
   <cffunction name="setAddresses" access="public"  output="false" hint="I set the Addresses into the variables.instance scope.">
@@ -804,6 +817,7 @@
         }
       </cfscript>
       <cfset variables.instance.Addresses = arr />
+      
   </cffunction>
 
   <!---
@@ -1013,7 +1027,7 @@
   </cffunction>
 
   <cffunction name="setBatchPayments" access="public"  output="false" hint="I set the BatchPayments into the variables.instance scope.">
-    <cfargument name="BatchPayments" type="String" hint="I am the BatchPayments." />
+    <cfargument name="BatchPayments" type="Struct" hint="I am the BatchPayments." />
       <cfset variables.instance.BatchPayments = arguments.BatchPayments />
   </cffunction>
 
